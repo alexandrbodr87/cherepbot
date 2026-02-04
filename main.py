@@ -17,7 +17,7 @@ client = OpenAI(api_key=DEEPSEEK_API_KEY, base_url="https://api.deepseek.com")
 def get_processed_links():
     if not os.path.exists(DB_FILE): return []
     with open(DB_FILE, "r") as f: 
-        return f.read().splitlines()[-100:]
+        return f.read().splitlines()[-150:]
 
 def save_link(link):
     with open(DB_FILE, "a") as f: f.write(link + "\n")
@@ -43,8 +43,8 @@ def ai_rewrite(title, text):
         response = client.chat.completions.create(
             model="deepseek-chat",
             messages=[
-                {"role": "system", "content": "Ты редактор новостей Череповца. Пиши кратко, до 300 симв, по делу."},
-                {"role": "user", "content": f"Перескажи новость для Череповца (макс 300 знаков). Заголовок жирным. Тема: {title}\nТекст: {text}"}
+                {"role": "system", "content": "Ты редактор Череповца. Пиши кратко, до 300 симв."},
+                {"role": "user", "content": f"Перескажи кратко (до 300 зн). Заголовок жирным. Тема: {title}\nТекст: {text}"}
             ],
             max_tokens=400,
             temperature=0.6
@@ -53,8 +53,9 @@ def ai_rewrite(title, text):
     except: return None
 
 def run():
-    query = '"Череповец" OR "Северсталь"'
-    url = f"https://newsapi.org/v2/everything?q={query}&language=ru&sortBy=publishedAt&pageSize=40&apiKey={NEWS_API_KEY}"
+    # Расширил поиск: город + область + крупные заводы
+    query = 'Череповец OR "Вологодская область" OR Северсталь OR ФосАгро'
+    url = f"https://newsapi.org/v2/everything?q={query}&language=ru&sortBy=publishedAt&pageSize=50&apiKey={NEWS_API_KEY}"
     try:
         r = requests.get(url, timeout=10)
         articles = r.json().get("articles", [])
@@ -64,8 +65,8 @@ def run():
             if posted >= 2: break
             l = a["url"]
             title = a.get("title", "")
-            content_check = (title + (a.get("description") or "")).lower()
-            if l not in db and ("череповец" in content_check or "северсталь" in content_check):
+            
+            if l not in db:
                 raw = get_full_text(l)
                 if not raw or len(raw) < 200: continue
                 txt = ai_rewrite(title, raw)
