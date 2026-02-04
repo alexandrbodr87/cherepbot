@@ -1,0 +1,28 @@
+name: Cherep News Bot
+on:
+  schedule:
+    - cron: '50 * * * *'
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: pip install pyTelegramBotAPI requests beautifulsoup4 openai
+      - name: Run bot
+        run: python main.py
+      - name: Save history
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add cher_links.txt
+          git commit -m "Update links" || exit 0
+          git push
