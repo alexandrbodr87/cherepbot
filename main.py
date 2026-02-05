@@ -13,7 +13,7 @@ bot = telebot.TeleBot(BOT_TOKEN)
 def ask_groq(title, text):
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {GROQ_KEY}", "Content-Type": "application/json"}
-    prompt = f"Сделай из этого огрызка новости полноценный короткий пост. Напиши яркий заголовок и 1-2 законченных предложения. Строго до 250 символов. Не обрывай на полуслове. Текст: {title}. {text}"
+    prompt = f"Сделай из этого огрызка новости полноценный короткий пост. Напиши яркий заголовок и 1-2 предложения сути. Итого строго до 250 символов. Не обрывай на полуслове, сделай мысль законченной. Текст: {title}. {text}"
     data = {"model": "llama3-8b-8192", "messages": [{"role": "user", "content": prompt}], "temperature": 0.6}
     try:
         r = requests.post(url, headers=headers, json=data, timeout=20).json()
@@ -26,14 +26,12 @@ def run():
     articles = r.get("articles", [])
     if not os.path.exists(DB_FILE): open(DB_FILE, 'w').close()
     with open(DB_FILE, 'r', encoding='utf-8') as f: done = f.read().splitlines()
-    
     p = 0
     for a in articles:
         if p >= 2: break
         if a["url"] not in done and a["title"] not in done:
             raw_text = a.get('description') or a.get('title')
             clean_text = raw_text.split('[+')[0]
-            
             summary = ask_groq(a['title'], clean_text)
             txt = summary if summary else a['title']
             msg = f"{txt}\n\n🏙 <a href='{CHANNEL_LINK}'>Череповец</a>"
