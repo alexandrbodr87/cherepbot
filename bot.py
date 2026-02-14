@@ -7,7 +7,7 @@ from telegram import Bot
 import asyncio
 
 TOKEN = "7201522733:AAEYnZkZvkF6B9b8ABUfPqFaTP7p172CZQI"
-CHAT_ID = "1003848831304"
+CHAT_ID = "-1003848831304"
 SOURCE_URL = "https://cherinfo.ru/news"
 BASE_URL = "https://cherinfo.ru"
 
@@ -22,14 +22,21 @@ async def get_rewrite(text):
         return text[:1000]
 
 async def main():
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
-    r = requests.get(SOURCE_URL, headers=headers)
-    soup = BeautifulSoup(r.text, 'html.parser')
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36'}
     
+    try:
+        r = requests.get(SOURCE_URL, headers=headers, timeout=20)
+        r.raise_for_status()
+    except:
+        return
+
+    soup = BeautifulSoup(r.text, 'html.parser')
     links = []
+
     for a in soup.find_all('a', href=True):
-        if '/news/' in a['href'] and a['href'] != '/news/':
-            full_url = a['href'] if a['href'].startswith('http') else BASE_URL + a['href']
+        href = a['href']
+        if '/news/' in href and any(char.isdigit() for char in href):
+            full_url = href if href.startswith('http') else BASE_URL + href
             if full_url not in links:
                 links.append(full_url)
 
@@ -48,20 +55,23 @@ async def main():
     article.parse()
     
     raw_text = article.text
+    if not raw_text:
+        return
+
     img = article.top_image
     rewritten_text = await get_rewrite(raw_text)
 
     bot = Bot(token=TOKEN)
     
     try:
-        if img and len(img) > 5:
+        if img and len(img) > 10:
             await bot.send_photo(chat_id=CHAT_ID, photo=img, caption=rewritten_text[:1024])
         else:
             await bot.send_message(chat_id=CHAT_ID, text=rewritten_text[:4096])
         
         with open("last_news.txt", "w") as f:
             f.write(link)
-    except Exception as e:
+    except:
         pass
 
 if __name__ == "__main__":
