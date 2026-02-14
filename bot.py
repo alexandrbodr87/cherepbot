@@ -22,12 +22,21 @@ async def get_rewrite(text):
         return text[:1000]
 
 async def main():
-    r = requests.get(SOURCE_URL, headers={'User-Agent': 'Mozilla/5.0'})
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+    r = requests.get(SOURCE_URL, headers=headers)
     soup = BeautifulSoup(r.text, 'html.parser')
     
-    first_news = soup.find('div', class_='news-item')
-    link_tag = first_news.find('a', href=True)
-    link = BASE_URL + link_tag['href']
+    links = []
+    for a in soup.find_all('a', href=True):
+        if '/news/' in a['href'] and a['href'] != '/news/':
+            full_url = a['href'] if a['href'].startswith('http') else BASE_URL + a['href']
+            if full_url not in links:
+                links.append(full_url)
+
+    if not links:
+        return
+
+    link = links[0]
 
     if os.path.exists("last_news.txt"):
         with open("last_news.txt", "r") as f:
@@ -45,7 +54,7 @@ async def main():
     bot = Bot(token=TOKEN)
     
     try:
-        if img:
+        if img and len(img) > 5:
             await bot.send_photo(chat_id=CHAT_ID, photo=img, caption=rewritten_text[:1024])
         else:
             await bot.send_message(chat_id=CHAT_ID, text=rewritten_text[:4096])
@@ -53,7 +62,7 @@ async def main():
         with open("last_news.txt", "w") as f:
             f.write(link)
     except Exception as e:
-        print(f"Error: {e}")
+        pass
 
 if __name__ == "__main__":
     asyncio.run(main())
