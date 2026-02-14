@@ -7,7 +7,7 @@ from telegram import Bot
 import asyncio
 
 TOKEN = "7201522733:AAEYnZkZvkF6B9b8ABUfPqFaTP7p172CZQI"
-CHAT_ID = "@cherepnew"
+CHAT_ID = "1003848831304"
 SOURCE_URL = "https://cherinfo.ru/news"
 BASE_URL = "https://cherinfo.ru"
 
