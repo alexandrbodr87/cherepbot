@@ -3,3 +3,4 @@ beautifulsoup4
 newspaper3k
 python-telegram-bot
 g4f
+lxml_html_clean
