@@ -8,8 +8,8 @@ import asyncio
 
 TOKEN = "7127328306:AAETwPeh0vCMxAeBi80VZQ2wb5viYWikOqg"
 CHAT_ID = "2435711059"
-SOURCE_URL = "https://cherinfo.ru/news"
-BASE_URL = "https://cherinfo.ru"
+SOURCE_URL = "https://omskgazzeta.ru/all-news"
+BASE_URL = "https://omskgazzeta.ru"
 
 async def get_rewrite(text):
     try:
