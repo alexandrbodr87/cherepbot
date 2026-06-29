@@ -6,8 +6,8 @@ import g4f
 from telegram import Bot
 import asyncio
 
-TOKEN = "7127"
-CHAT_ID = "243"
+TOKEN = "7127328306:AAETwPeh0vCMxAeBi80VZQ2wb5viYWikOqg"
+CHAT_ID = "-1002435711059"
 SOURCE_URL = "https://cherinfo.ru/news"
 BASE_URL = "https://cherinfo.ru"
 
