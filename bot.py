@@ -10,6 +10,14 @@ TOKEN = "7127328306:AAETwPeh0vCMxAeBi80VZQ2wb5viYWikOqg"
 CHAT_ID = "-1002435711059"
 SOURCE_URL = "https://cherinfo.ru/news"
 BASE_URL = "https://cherinfo.ru"
+SOURCE_URL = "https://ngs42.ru/text/gorod"
+BASE_URL = "https://ngs42.ru"
+SOURCE_URL = https://gazeta.a42.ru/lenta/news/kuzbass"
+BASE_URL = "https://gazeta.a42.ru"
+SOURCE_URL = "https://www.om1.ru/news"
+BASE_URL = "https://www.om1.ru"
+SOURCE_URL = "https://omskinform.ru"
+BASE_URL = "https://omskinform.ru"
 
 async def get_rewrite(text):
     try:
